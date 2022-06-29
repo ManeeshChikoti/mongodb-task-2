@@ -1,0 +1,413 @@
+Design database for Zen class programme
+users
+codekata
+attendance
+topics
+tasks
+company_drives
+mentors
+
+Users: db.users.find().pretty()
+
+{
+        "_id" : ObjectId("62b97b87517e105aa29f5024"),
+        "user_id" : 1,
+        "name" : " user A",
+        "drives_attended" : [
+                "company x",
+                "company y"
+        ],
+        "mentor_name" : "mentor 1"
+}
+{
+        "_id" : ObjectId("62b97bcd517e105aa29f5025"),
+        "user_id" : 2,
+        "name" : " user B",
+        "drives_attended" : [
+                "company y",
+                "company z"
+        ],
+        "mentor_name" : "mentor 1"
+}
+{
+        "_id" : ObjectId("62b97c2c517e105aa29f5026"),
+        "user_id" : 3,
+        "name" : " user c",
+        "drives_attended" : [
+                "company z",
+                "company x"
+        ],
+        "mentor_name" : "mentor 1"
+}
+
+
+
+Codekata:
+
+> db.codekata.find().pretty()
+{
+        "_id" : ObjectId("62b9835d517e105aa29f5027"),
+        "user_id" : 1,
+        "problems_solved" : 100
+}
+{
+        "_id" : ObjectId("62b9836d517e105aa29f5028"),
+        "user_id" : 2,
+        "problems_solved" : 110
+}
+{
+        "_id" : ObjectId("62b9837c517e105aa29f5029"),
+        "user_id" : 3,
+        "problems_solved" : 120
+}
+
+
+Attendance: db.attendance.find().pretty()
+
+{
+        "_id" : ObjectId("62b9a21b517e105aa29f5030"),
+        "topic_id" : 1,
+        "attended" : [
+                "user A",
+                "user B",
+                "user C"
+        ],
+        "topic_date" : ISODate("2020-10-17T00:00:00Z"),
+        "not_attended" : null
+}
+{
+        "_id" : ObjectId("62b9a231517e105aa29f5031"),
+        "topic_id" : 2,
+        "attended" : [
+                "user A",
+                "user B"
+        ],
+        "topic_date" : ISODate("2020-10-27T00:00:00Z"),
+        "not_attended" : "user C"
+}
+{
+        "_id" : ObjectId("62b9a243517e105aa29f5032"),
+        "topic_id" : 3,
+        "attended" : [
+                "user A",
+                "user B"
+        ],
+        "topic_date" : ISODate("2020-11-01T00:00:00Z"),
+        "not_attended" : "user C"
+}
+
+
+Topics: db.topics.find().pretty()
+
+{
+        "_id" : ObjectId("62b98fdb517e105aa29f502a"),
+        "topic_id" : 1,
+        "topic_name" : "Topic 1",
+        "topic_date" : ISODate("2020-10-17T00:00:00Z")
+}
+{
+        "_id" : ObjectId("62b99004517e105aa29f502b"),
+        "topic_id" : 2,
+        "topic_name" : "Topic 2",
+        "topic_date" : ISODate("2020-10-27T00:00:00Z")
+}
+{
+        "_id" : ObjectId("62b99035517e105aa29f502c"),
+        "topic_id" : 3,
+        "topic_name" : "Topic 3",
+        "topic_date" : ISODate("2020-11-01T00:00:00Z")
+}
+
+
+Tasks:  db.tasks.find().pretty()
+{
+        "_id" : ObjectId("62b99adf517e105aa29f502d"),
+        "topic_id" : 1,
+        "task" : "task A",
+        "submitted" : [
+                "user A",
+                "user B"
+        ],
+        "due_date" : ISODate("2020-10-17T00:00:00Z"),
+        "not_submitted" : "user C"
+}
+{
+        "_id" : ObjectId("62b99ce3517e105aa29f502e"),
+        "topic_id" : 2,
+        "task" : "task B",
+        "submitted" : "user A",
+        "due_date" : ISODate("2020-10-27T00:00:00Z"),
+        "not_submitted" : [
+                "user B",
+                "user C"
+        ]
+}
+{
+        "_id" : ObjectId("62b99e9f517e105aa29f502f"),
+        "topic_id" : 3,
+        "task" : "task C",
+        "submitted" : null,
+        "due_date" : ISODate("2020-11-01T00:00:00Z"),
+        "not_submitted" : [
+                "user A",
+                "user B",
+                "user C"
+        ]
+}
+
+
+
+Company_drives:   db.comapanydrives.find().pretty()
+
+
+{
+        "_id" : ObjectId("62b9a3b3517e105aa29f5033"),
+        "company" : "company x",
+        "drivedate" : ISODate("2020-10-15T00:00:00Z")
+}
+{
+        "_id" : ObjectId("62b9a415517e105aa29f5034"),
+        "company" : "company y",
+        "drivedate" : ISODate("2020-10-25T00:00:00Z")
+}
+{
+        "_id" : ObjectId("62b9a446517e105aa29f5035"),
+        "company" : "company z",
+        "drivedate" : ISODate("2020-11-27T00:00:00Z")
+}
+
+
+
+Mentors: db.mentors.find().pretty()
+
+
+{
+        "_id" : ObjectId("62b9a548517e105aa29f5036"),
+        "mentorId" : 1,
+        "mentor_name" : "mentor 1",
+        "mentees_count" : 20
+}
+{
+        "_id" : ObjectId("62b9a5a8517e105aa29f5037"),
+        "mentorId" : 2,
+        "mentor_name" : "mentor 2",
+        "mentees_count" : 10
+}
+
+
+
+
+
+1.Find all the topics and tasks which are thought in the month of October
+
+
+Ans:
+
+db.topics.aggregate([
+...  { $lookup:{ from:"tasks",localField:"topic_id", foreignField:"topic_id",
+...  pipeline:[
+...  {$project:{_id:0,topic_id:0,submitted:0}}], as:"taskdetails"}},
+... {$match:{$and:[{"topic_date":{$gt:ISODate("2020-09-30")}},{"topic_date":{$lt:ISODate("2020-10-31")}}]}}
+... ]).pretty()
+
+Output:
+
+
+{
+        "_id" : ObjectId("62b98fdb517e105aa29f502a"),
+        "topic_id" : 1,
+        "topic_name" : "Topic 1",
+        "topic_date" : ISODate("2020-10-17T00:00:00Z"),
+        "taskdetails" : [
+                {
+                        "task" : "task A",
+                        "due_date" : ISODate("2020-10-17T00:00:00Z")
+                }
+        ]
+}
+{
+        "_id" : ObjectId("62b99004517e105aa29f502b"),
+        "topic_id" : 2,
+        "topic_name" : "Topic 2",
+        "topic_date" : ISODate("2020-10-27T00:00:00Z"),
+        "taskdetails" : [
+                {
+                        "task" : "task B",
+                        "due_date" : ISODate("2020-10-27T00:00:00Z")
+                }
+        ]
+}
+
+
+2.Find all the company drives which appeared between 15 oct-2020 and 31-oct-2020
+
+ans:
+
+db.comapanydrives.find(
+... {
+... drivedate:{$gt:new Date("2020-10-14"),$lt: new Date("2020-11-01")}
+... }).pretty()
+
+output:
+
+{
+        "_id" : ObjectId("62b9a3b3517e105aa29f5033"),
+        "company" : "company x",
+        "drivedate" : ISODate("2020-10-15T00:00:00Z")
+}
+{
+        "_id" : ObjectId("62b9a415517e105aa29f5034"),
+        "company" : "company y",
+        "drivedate" : ISODate("2020-10-25T00:00:00Z")
+}
+
+3.Find all the company drives and students who are appeared for the placement.
+
+
+ans:
+
+
+db.comapanydrives.aggregate([  {$lookup: { from:"users", localField:"company", foreignField:"drives_attended", as:"users_attended" }},
+... {$project:{"users_attended._id":0,"users_attended.drives_attended":0,"users_attended.mentor_name":0}}
+... ]).pretty()
+
+Output:
+
+{
+        "_id" : ObjectId("62b9a3b3517e105aa29f5033"),
+        "company" : "company x",
+        "drivedate" : ISODate("2020-10-15T00:00:00Z"),
+        "users_attended" : [
+                {
+                        "user_id" : 1,
+                        "name" : " user A"
+                },
+                {
+                        "user_id" : 3,
+                        "name" : " user c"
+                }
+        ]
+}
+{
+        "_id" : ObjectId("62b9a415517e105aa29f5034"),
+        "company" : "company y",
+        "drivedate" : ISODate("2020-10-25T00:00:00Z"),
+        "users_attended" : [
+                {
+                        "user_id" : 1,
+                        "name" : " user A"
+                },
+                {
+                        "user_id" : 2,
+                        "name" : " user B"
+                }
+        ]
+}
+{
+        "_id" : ObjectId("62b9a446517e105aa29f5035"),
+        "company" : "company z",
+        "drivedate" : ISODate("2020-11-27T00:00:00Z"),
+        "users_attended" : [
+                {
+                        "user_id" : 2,
+                        "name" : " user B"
+                },
+                {
+                        "user_id" : 3,
+                        "name" : " user c"
+                }
+        ]
+}
+
+
+4.Find the number of problems solved by the user in codekata
+
+ans: db.codekata.find().pretty()
+
+Output:
+
+{
+        "_id" : ObjectId("62b9835d517e105aa29f5027"),
+        "user_id" : 1,
+        "problems_solved" : 100
+}
+{
+        "_id" : ObjectId("62b9836d517e105aa29f5028"),
+        "user_id" : 2,
+        "problems_solved" : 110
+}
+{
+        "_id" : ObjectId("62b9837c517e105aa29f5029"),
+        "user_id" : 3,
+        "problems_solved" : 120
+}
+
+
+5.Find all the mentors with who has the mentee's count more than 15
+
+ans:
+
+db.mentors.find( {mentees_count:{$gt:15}} ).pretty()
+
+Output:
+
+{
+        "_id" : ObjectId("62b9a548517e105aa29f5036"),
+        "mentorId" : 1,
+        "mentor_name" : "mentor 1",
+        "mentees_count" : 20
+}
+
+
+6.Find the number of users who are absent and task is not submitted  between 15 oct-2020 and 31-oct-2020
+
+
+Ans:
+
+
+>  db.attendance.aggregate([
+...  {$match:{"topic_date" :{$gt:ISODate("2020-10-14"),$lt: ISODate("2020-11-01")}}},
+...  {$project:{"attended":0,}},
+...  {$lookup:{
+...  from:"tasks",
+...  localField: "topic_id",
+...  foreignField: "topic_id",
+...  pipeline:[
+...  {$project:{"_id" :0, "topic_id" : 0, "submitted" :0,}}],
+...  as:"tasksinfo"
+...  }}
+...  ]).pretty()
+
+Output:
+
+
+{
+        "_id" : ObjectId("62b9a21b517e105aa29f5030"),
+        "topic_id" : 1,
+        "topic_date" : ISODate("2020-10-17T00:00:00Z"),
+        "not_attended" : null,
+        "tasksinfo" : [
+                {
+                        "task" : "task A",
+                        "due_date" : ISODate("2020-10-17T00:00:00Z"),
+                        "not_submitted" : "user C"
+                }
+        ]
+}
+{
+        "_id" : ObjectId("62b9a231517e105aa29f5031"),
+        "topic_id" : 2,
+        "topic_date" : ISODate("2020-10-27T00:00:00Z"),
+        "not_attended" : "user C",
+        "tasksinfo" : [
+                {
+                        "task" : "task B",
+                        "due_date" : ISODate("2020-10-27T00:00:00Z"),
+                        "not_submitted" : [
+                                "user B",
+                                "user C"
+                        ]
+                }
+        ]
+}
+ 
